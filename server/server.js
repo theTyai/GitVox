@@ -16,6 +16,13 @@ require('./config/passport')(passport);
 const app = express();
 const server = http.createServer(app);
 
+// ----------------------------------------------------------------------
+// 👇 CRITICAL FIX FOR RENDER DEPLOYMENT
+// This tells Express to trust the HTTPS proxy provided by Render.
+// Without this, the secure cookie will be blocked, causing 401 errors.
+app.set('trust proxy', 1);
+// ----------------------------------------------------------------------
+
 // --- DB CONNECTION ---
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/gitvox')
   .then(() => console.log('✅ MongoDB Connected'))
@@ -39,7 +46,10 @@ const sessionMiddleware = session({
     collectionName: 'sessions' 
   }),
   cookie: { 
+      // Secure MUST be true on Render (HTTPS), but false on localhost
       secure: process.env.NODE_ENV === 'production', 
+      // SameSite 'none' is required for cross-site cookies (Frontend Vercel -> Backend Render)
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       httpOnly: true, 
       maxAge: 24 * 60 * 60 * 1000 
   }

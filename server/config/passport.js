@@ -6,7 +6,7 @@ module.exports = function(passport) {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       // Use the Env Variable for Prod, fallback to localhost for Dev
-      callbackURL: process.env.GITHUB_CALLBACK_URL || "http://localhost:5000/auth/github/callback"
+      callbackURL: process.env.GITHUB_CALLBACK_URL || "http://gitvox.onrender.com/auth/github/callback"
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

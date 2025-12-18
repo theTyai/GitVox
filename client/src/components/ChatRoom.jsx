@@ -1,7 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import io from 'socket.io-client';
+import { BASE_URL } from '../api'; // Import the dynamic URL
+import { FaTerminal } from 'react-icons/fa';
 
-const socket = io('http://localhost:5000', { withCredentials: true, autoConnect: false });
+// Initialize socket outside component to prevent multiple instances
+const socket = io(BASE_URL, { 
+    withCredentials: true, 
+    autoConnect: false,
+    transports: ['websocket', 'polling']
+});
 
 function ChatRoom({ repoId, commitHash }) {
   const [messages, setMessages] = useState([]);
@@ -9,43 +16,86 @@ function ChatRoom({ repoId, commitHash }) {
   const bottomRef = useRef(null);
 
   useEffect(() => {
+    // 1. Connect
     socket.connect();
+    
+    // 2. Join the specific commit room
     socket.emit('join_commit', { commitHash, repoId });
-    socket.on('receive_message', (msg) => {
+
+    // 3. Listen for incoming messages
+    const handleReceiveMessage = (msg) => {
       setMessages((prev) => [...prev, msg]);
-      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-    });
-    return () => { socket.off('receive_message'); socket.disconnect(); };
+      // Auto-scroll to bottom
+      setTimeout(() => {
+          bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    };
+
+    socket.on('receive_message', handleReceiveMessage);
+
+    // 4. Cleanup on unmount
+    return () => { 
+        socket.off('receive_message', handleReceiveMessage); 
+        socket.disconnect(); 
+    };
   }, [commitHash, repoId]);
 
   const sendMessage = () => {
     if(!input.trim()) return;
-    socket.emit('send_message', { commitHash, repoId, message: input });
+    
+    // Emit message to server
+    socket.emit('send_message', { 
+        commitHash, 
+        repoId, 
+        message: input 
+    });
+    
     setInput('');
   };
 
   return (
-    <div className="flex-1 bg-gray-800 rounded border border-gray-700 flex flex-col">
-      <div className="p-3 border-b border-gray-700 font-bold text-gray-300">Discussion</div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className="flex flex-col h-full bg-black">
+      {/* MESSAGES AREA */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-1 custom-scrollbar">
+        {messages.length === 0 && (
+            <div className="text-gray-700 text-xs font-mono mt-4">
+                [SYSTEM] Channel open. No previous traffic.
+            </div>
+        )}
+        
         {messages.map((m, i) => (
-          <div key={i} className="flex gap-3">
-             <img src={m.sender.avatarUrl} className="w-8 h-8 rounded-full" />
-             <div>
-               <div className="flex items-baseline gap-2">
-                 <span className="font-bold text-sm text-purple-400">{m.sender.username}</span>
-                 <span className="text-xs text-gray-500">{m.sender.profession}</span>
-               </div>
-               <p className="text-gray-200 text-sm">{m.message}</p>
-             </div>
+          <div key={i} className="group hover:bg-[#111] p-1 -mx-2 px-2 rounded-sm flex items-start gap-2 text-sm">
+             <span className="text-gray-500 text-[10px] w-12 pt-1 font-mono">
+                {new Date(m.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+             </span>
+             <span className="font-bold text-red-600 text-xs pt-0.5">
+                &lt;{m.sender.username}&gt;
+             </span>
+             <span className="text-gray-300 font-mono break-all">
+                {m.message}
+             </span>
           </div>
         ))}
         <div ref={bottomRef} />
       </div>
-      <div className="p-3 border-t border-gray-700">
-        <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendMessage()} placeholder="Type a message..." className="w-full bg-gray-900 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none"/>
+
+      {/* INPUT AREA */}
+      <div className="p-3 bg-[#111] border-t border-gray-800">
+        <div className="flex items-center gap-2 bg-black border border-gray-700 p-2 focus-within:border-red-600 transition-colors">
+            <span className="text-red-500 font-bold text-xs">user@gitvox:$</span>
+            <input 
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+              autoFocus
+              className="flex-1 bg-transparent text-white text-sm font-mono focus:outline-none placeholder-gray-700"
+              placeholder="./send_message..."
+            />
+        </div>
+        <div className="text-[9px] text-gray-600 mt-1 uppercase text-right">Encrypted Transmission // Socket.IO Secure</div>
       </div>
     </div>
   );
 }
+
 export default ChatRoom;

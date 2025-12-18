@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-// 1. Get the API URL from environment variables, or fallback to localhost
-// On Render (Frontend), you will set VITE_API_URL in the dashboard
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// --- HARDCODED BACKEND URL ---
+// 1. Standard Render URL structure is https://<app-name>.onrender.com
+// 2. We use this directly instead of localhost
+const BASE_URL = 'https://gitvox.onrender.com'; 
 
-// 2. Create an Axios instance
 const api = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // Crucial for Cookies/Sessions
+  withCredentials: true, // Required for cookies/sessions to work across domains
 });
 
 export default api;

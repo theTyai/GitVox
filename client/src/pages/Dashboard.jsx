@@ -21,7 +21,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchTargets = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/repos');
+            const res = await axios.get('http://gitvox.onrender.com/api/repos');
             setActiveTargets(res.data);
         } catch (e) { console.error(e); }
     };
@@ -32,7 +32,7 @@ function Dashboard() {
   useEffect(() => {
     if (showAddModal) {
       setLoadingRepos(true);
-      axios.get('http://localhost:5000/api/github/my-repos')
+      axios.get('http://gitvox.onrender.com/api/github/my-repos')
         .then(res => setGithubRepos(res.data))
         .catch(console.error)
         .finally(() => setLoadingRepos(false));
@@ -41,7 +41,7 @@ function Dashboard() {
 
   const handleIngest = async (repoUrl) => {
     try {
-      const res = await axios.post('http://localhost:5000/api/repo', { 
+      const res = await axios.post('http://gitvox.onrender.com/api/repo', { 
           url: repoUrl,
           inviteUser: inviteUser 
       });

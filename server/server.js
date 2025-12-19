@@ -16,12 +16,10 @@ require('./config/passport')(passport);
 const app = express();
 const server = http.createServer(app);
 
-// ----------------------------------------------------------------------
-// 👇 CRITICAL FIX FOR RENDER DEPLOYMENT
-// This tells Express to trust the HTTPS proxy provided by Render.
-// Without this, the secure cookie will be blocked, causing 401 errors.
+// ---------------------------------------------------------
+// 👇 CRITICAL: Trust Render's Proxy (Fixes 401 Auth Error)
 app.set('trust proxy', 1);
-// ----------------------------------------------------------------------
+// ---------------------------------------------------------
 
 // --- DB CONNECTION ---
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/gitvox')
@@ -30,6 +28,7 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/gitvox')
 
 // --- MIDDLEWARE ---
 app.use(cors({ 
+    // Allow Vercel Frontend OR Localhost
     origin: process.env.CLIENT_URL || "http://localhost:5173", 
     credentials: true 
 }));
@@ -46,9 +45,9 @@ const sessionMiddleware = session({
     collectionName: 'sessions' 
   }),
   cookie: { 
-      // Secure MUST be true on Render (HTTPS), but false on localhost
+      // Secure MUST be true on Render (HTTPS)
       secure: process.env.NODE_ENV === 'production', 
-      // SameSite 'none' is required for cross-site cookies (Frontend Vercel -> Backend Render)
+      // SameSite 'none' allows cookies cross-domain (Vercel -> Render)
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       httpOnly: true, 
       maxAge: 24 * 60 * 60 * 1000 
@@ -97,7 +96,6 @@ app.get('/api/user/profile/:username', async (req, res) => {
 
 // --- REPO ROUTES ---
 
-// 1. Get Available GitHub Repos
 app.get('/api/github/my-repos', async (req, res) => {
   if (!req.isAuthenticated()) return res.status(401).send();
   try {
@@ -117,7 +115,6 @@ app.get('/api/github/my-repos', async (req, res) => {
   } catch (err) { res.status(500).json({ error: "Failed to fetch GitHub repos" }); }
 });
 
-// 2. Get Ingested Repos
 app.get('/api/repos', async (req, res) => {
   if (!req.isAuthenticated()) return res.status(401).send();
   try {
@@ -126,7 +123,6 @@ app.get('/api/repos', async (req, res) => {
   } catch (err) { res.status(500).json([]); }
 });
 
-// 3. Ingest Repo
 app.post('/api/repo', async (req, res) => {
   if (!req.isAuthenticated()) return res.status(401).send();
   
@@ -191,7 +187,6 @@ app.post('/api/repo', async (req, res) => {
   }
 });
 
-// 4. Get Repo Data
 app.get('/api/repo/:id', async (req, res) => {
   if (!req.isAuthenticated()) return res.status(401).send();
   try {
@@ -299,7 +294,7 @@ app.post('/api/repo/:id/accept', async (req, res) => {
     }
 });
 
-// --- BUGS ---
+// --- BUGS & NOTIFICATIONS ---
 app.post('/api/bugs', async (req, res) => {
   if (!req.isAuthenticated()) return res.status(401).send();
   const bug = await Bug.create({ ...req.body, reporter: req.user._id });
@@ -316,12 +311,12 @@ app.post('/api/bug/:id/toggle', async (req, res) => {
     } catch(e) { res.status(500).send("Error"); }
 });
 
-// --- NOTIFICATIONS ---
 app.get('/api/notifications', async (req, res) => {
   if (!req.isAuthenticated()) return res.status(401).send();
   const notes = await Notification.find({ recipient: req.user._id }).sort({ createdAt: -1 }).limit(20);
   res.json(notes);
 });
+
 app.post('/api/notifications/mark-read', async (req, res) => {
   if (!req.isAuthenticated()) return res.status(401).send();
   await Notification.updateMany({ recipient: req.user._id, read: false }, { read: true });

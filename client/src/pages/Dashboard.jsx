@@ -1,11 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import ActivityFeed from '../components/ActivityFeed';
-import Footer from '../components/Footer'; // Import Footer
+import Footer from '../components/Footer';
 import { AuthContext } from '../context/AuthContext';
-import { FaSearch, FaPlus, FaHdd, FaCircle, FaServer, FaLock, FaGlobe, FaUserPlus } from 'react-icons/fa';
+import api from '../api'; // Use centralized API
+import { FaSearch, FaPlus, FaHdd, FaCircle, FaServer, FaLock, FaGlobe } from 'react-icons/fa';
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
@@ -17,22 +17,20 @@ function Dashboard() {
   const [inviteUser, setInviteUser] = useState('');
   const navigate = useNavigate();
 
-  // Load Active Targets
   useEffect(() => {
     const fetchTargets = async () => {
         try {
-            const res = await axios.get('http://gitvox.onrender.com/api/repos');
+            const res = await api.get('/api/repos');
             setActiveTargets(res.data);
         } catch (e) { console.error(e); }
     };
     fetchTargets();
   }, []);
 
-  // Load GitHub Repos on Modal Open
   useEffect(() => {
     if (showAddModal) {
       setLoadingRepos(true);
-      axios.get('http://gitvox.onrender.com/api/github/my-repos')
+      api.get('/api/github/my-repos')
         .then(res => setGithubRepos(res.data))
         .catch(console.error)
         .finally(() => setLoadingRepos(false));
@@ -41,7 +39,7 @@ function Dashboard() {
 
   const handleIngest = async (repoUrl) => {
     try {
-      const res = await axios.post('http://gitvox.onrender.com/api/repo', { 
+      const res = await api.post('/api/repo', { 
           url: repoUrl,
           inviteUser: inviteUser 
       });

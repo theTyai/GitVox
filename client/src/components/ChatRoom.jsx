@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import io from 'socket.io-client';
-import { BASE_URL } from '../api'; // Import the dynamic URL
+import { BASE_URL } from '../api'; // Use centralized API
 import { FaTerminal } from 'react-icons/fa';
 
-// Initialize socket outside component to prevent multiple instances
 const socket = io(BASE_URL, { 
     withCredentials: true, 
     autoConnect: false,
@@ -16,16 +15,11 @@ function ChatRoom({ repoId, commitHash }) {
   const bottomRef = useRef(null);
 
   useEffect(() => {
-    // 1. Connect
     socket.connect();
-    
-    // 2. Join the specific commit room
     socket.emit('join_commit', { commitHash, repoId });
 
-    // 3. Listen for incoming messages
     const handleReceiveMessage = (msg) => {
       setMessages((prev) => [...prev, msg]);
-      // Auto-scroll to bottom
       setTimeout(() => {
           bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
@@ -33,7 +27,6 @@ function ChatRoom({ repoId, commitHash }) {
 
     socket.on('receive_message', handleReceiveMessage);
 
-    // 4. Cleanup on unmount
     return () => { 
         socket.off('receive_message', handleReceiveMessage); 
         socket.disconnect(); 
@@ -42,20 +35,12 @@ function ChatRoom({ repoId, commitHash }) {
 
   const sendMessage = () => {
     if(!input.trim()) return;
-    
-    // Emit message to server
-    socket.emit('send_message', { 
-        commitHash, 
-        repoId, 
-        message: input 
-    });
-    
+    socket.emit('send_message', { commitHash, repoId, message: input });
     setInput('');
   };
 
   return (
     <div className="flex flex-col h-full bg-black">
-      {/* MESSAGES AREA */}
       <div className="flex-1 overflow-y-auto p-4 space-y-1 custom-scrollbar">
         {messages.length === 0 && (
             <div className="text-gray-700 text-xs font-mono mt-4">
@@ -79,7 +64,6 @@ function ChatRoom({ repoId, commitHash }) {
         <div ref={bottomRef} />
       </div>
 
-      {/* INPUT AREA */}
       <div className="p-3 bg-[#111] border-t border-gray-800">
         <div className="flex items-center gap-2 bg-black border border-gray-700 p-2 focus-within:border-red-600 transition-colors">
             <span className="text-red-500 font-bold text-xs">user@gitvox:$</span>

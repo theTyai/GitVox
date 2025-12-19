@@ -1,22 +1,19 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
-import axios from 'axios';
-import { FaGithub, FaSave, FaHistory, FaBug, FaComment } from 'react-icons/fa';
+import api from '../api'; // Use centralized API
+import { FaHistory, FaBug, FaComment } from 'react-icons/fa';
 
 function Profile() {
   const { user, setUser } = useContext(AuthContext);
   const [displayName, setDisplayName] = useState(user.displayName || '');
   const [profession, setProfession] = useState(user.profession || '');
-  const [myActivity, setMyActivity] = useState([]); // User specific history
+  const [myActivity, setMyActivity] = useState([]);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState('');
 
-  // Fetch only THIS user's activity
   useEffect(() => {
-    // We reuse the feed logic but would ideally filter by user ID on backend
-    // For now, let's just fetch the global feed and filter locally for simplicity
-    axios.get('http://localhost:5000/api/activity/feed')
+    api.get('/api/activity/feed')
          .then(res => {
             const mine = res.data.filter(a => a.user === user.username);
             setMyActivity(mine);
@@ -28,7 +25,7 @@ function Profile() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/user/update', { displayName, profession });
+      await api.post('/api/user/update', { displayName, profession });
       setUser({ ...user, displayName, profession });
       setMsg('SUCCESS: PROFILE_UPDATED');
     } catch (err) { setMsg('ERROR: UPDATE_FAILED'); }
@@ -41,7 +38,6 @@ function Profile() {
       
       <div className="max-w-6xl mx-auto mt-8 p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
         
-        {/* LEFT COL: EDIT PROFILE */}
         <div className="md:col-span-1">
             <div className="bg-black border border-gray-800 p-6 relative">
               <div className="absolute top-0 left-0 w-full h-1 bg-red-600"></div>
@@ -70,7 +66,6 @@ function Profile() {
             </div>
         </div>
 
-        {/* RIGHT COL: MY CONTRIBUTIONS */}
         <div className="md:col-span-2">
             <div className="border border-gray-800 min-h-[400px]">
                 <div className="bg-gray-900 p-3 border-b border-gray-800 flex items-center gap-2 text-sm font-bold text-gray-300">

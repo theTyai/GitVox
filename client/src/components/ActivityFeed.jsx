@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api'; // Use centralized API
 import { useNavigate } from 'react-router-dom';
 
 function ActivityFeed() {
@@ -9,7 +9,7 @@ function ActivityFeed() {
   useEffect(() => {
     const fetchActivity = async () => {
       try {
-        const res = await axios.get('http://gitvox.onrender.com/api/activity/feed');
+        const res = await api.get('/api/activity/feed');
         setActivities(res.data);
       } catch (e) {}
     };

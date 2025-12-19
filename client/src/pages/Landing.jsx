@@ -1,11 +1,10 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { FaGithub, FaTerminal, FaCode, FaBug, FaLock, FaArrowRight, FaBolt, FaServer, FaCheckCircle, FaHdd } from 'react-icons/fa';
+import { FaGithub, FaTerminal, FaCode, FaBug, FaLock, FaArrowRight, FaBolt, FaServer, FaHdd } from 'react-icons/fa';
 import Typewriter from '../components/Typewriter';
 import Footer from '../components/Footer';
 
-// Scroll Reveal Helper
 const RevealOnScroll = ({ children }) => {
     const [isVisible, setIsVisible] = useState(false);
     const ref = useRef(null);
@@ -34,11 +33,8 @@ function Landing() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-gray-300 font-mono flex flex-col relative overflow-x-hidden selection:bg-red-600 selection:text-white">
-      
-      {/* Background */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] bg-[size:40px_40px] z-0 pointer-events-none opacity-30"></div>
       
-      {/* NAVBAR */}
       <nav className="fixed top-0 w-full bg-black/90 backdrop-blur-md border-b border-gray-800 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
           <div className="flex items-center gap-2 text-white font-bold tracking-tighter text-xl cursor-default">
@@ -54,12 +50,8 @@ function Landing() {
         </div>
       </nav>
 
-      {/* HERO SECTION */}
       <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 z-10 max-w-7xl mx-auto w-full">
-        {/* Grid: Stacks on mobile (cols-1), Side-by-side on Laptop (lg:cols-2) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          
-          {/* Left: Text */}
           <div className="space-y-8 animate-fade-in">
             <div className="inline-flex items-center gap-2 px-3 py-1 border border-red-600/50 bg-red-900/10 text-[10px] font-bold text-red-500 uppercase tracking-widest shadow-[0_0_10px_rgba(220,38,38,0.2)]">
               <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
@@ -87,7 +79,6 @@ function Landing() {
             </div>
           </div>
 
-          {/* Right: Terminal */}
           <div className="w-full bg-[#080808] border border-gray-700 rounded-sm shadow-2xl overflow-hidden min-h-[320px] hover:border-red-600 transition-colors duration-500">
              <div className="bg-[#111] border-b border-gray-800 p-2 px-4 flex justify-between items-center">
                 <div className="flex gap-2">
@@ -116,7 +107,6 @@ function Landing() {
         </div>
       </section>
 
-      {/* --- HOW IT WORKS (Execution Protocol) --- */}
       <section className="py-24 border-t border-gray-900 bg-black relative z-10">
         <div className="max-w-7xl mx-auto px-6">
             <RevealOnScroll>
@@ -128,33 +118,15 @@ function Landing() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-                    {/* Connecting Line (Desktop) */}
                     <div className="hidden md:block absolute top-12 left-0 right-0 h-0.5 bg-gray-800 z-0"></div>
-
-                    <ProtocolStep 
-                        step="01" 
-                        title="Authenticate" 
-                        desc="Login securely via GitHub OAuth. We automatically sync your public and private repositories."
-                        icon={<FaGithub />}
-                    />
-                    <ProtocolStep 
-                        step="02" 
-                        title="Mount Target" 
-                        desc="Select a repository from the dashboard. This creates a secure, real-time socket connection."
-                        icon={<FaServer />}
-                    />
-                    <ProtocolStep 
-                        step="03" 
-                        title="Execute" 
-                        desc="Click any Commit Hash to open a dedicated chat stream and bug tracker for that specific context."
-                        icon={<FaTerminal />}
-                    />
+                    <ProtocolStep step="01" title="Authenticate" desc="Login securely via GitHub OAuth. We automatically sync your public and private repositories." icon={<FaGithub />} />
+                    <ProtocolStep step="02" title="Mount Target" desc="Select a repository from the dashboard. This creates a secure, real-time socket connection." icon={<FaServer />} />
+                    <ProtocolStep step="03" title="Execute" desc="Click any Commit Hash to open a dedicated chat stream and bug tracker for that specific context." icon={<FaTerminal />} />
                 </div>
             </RevealOnScroll>
         </div>
       </section>
 
-      {/* --- FEATURES GRID --- */}
       <section className="py-24 border-t border-gray-900 bg-[#080808] relative z-10">
         <div className="max-w-7xl mx-auto px-6">
            <RevealOnScroll>
@@ -172,15 +144,11 @@ function Landing() {
         </div>
       </section>
 
-      {/* --- DEVELOPED BY SECTION --- */}
       <section className="py-24 border-t border-gray-900 bg-black">
          <div className="max-w-7xl mx-auto px-6">
             <RevealOnScroll>
                 <div className="bg-[#0a0a0a] border border-gray-800 p-8 md:p-12 relative overflow-hidden group hover:border-red-900 transition-colors">
-                    {/* Glowing effect on hover */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-red-900/10 rounded-full blur-3xl group-hover:bg-red-900/20 transition-all"></div>
-
-                    {/* Grid: Stacks on mobile, Side-by-side on laptop */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
                         <div className="flex-1">
                             <h2 className="text-3xl font-bold text-white mb-4 uppercase">Dev_Environment</h2>
@@ -189,14 +157,9 @@ function Landing() {
                                 GitVox was born from the need to have the conversation <span className="text-white font-bold underline decoration-red-600 underline-offset-4">where the code lives</span>."
                             </p>
                             <div className="flex gap-3">
-                                <Badge label="React" />
-                                <Badge label="Node.js" />
-                                <Badge label="Socket.IO" />
-                                <Badge label="MongoDB" />
+                                <Badge label="React" /><Badge label="Node.js" /><Badge label="Socket.IO" /><Badge label="MongoDB" />
                             </div>
                         </div>
-                        
-                        {/* Profile Card */}
                         <div className="bg-black border border-gray-800 p-6 shadow-2xl min-w-[280px] transform group-hover:scale-105 transition-transform duration-500">
                             <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-800">
                                 <span className="text-[10px] text-gray-500 uppercase tracking-widest">Developer ID</span>
@@ -225,8 +188,6 @@ function Landing() {
   );
 }
 
-// --- UI COMPONENTS ---
-
 function ProtocolStep({ step, title, desc, icon }) {
     return (
         <div className="relative z-10 bg-black p-6 border border-gray-800 text-center hover:border-red-600 transition-colors group">
@@ -253,11 +214,7 @@ function FeatureCard({ icon, title, desc }) {
 }
 
 function Badge({ label }) {
-    return (
-        <span className="px-3 py-1 border border-gray-700 text-xs font-bold text-gray-400 bg-gray-900/50 uppercase">
-            {label}
-        </span>
-    )
+    return <span className="px-3 py-1 border border-gray-700 text-xs font-bold text-gray-400 bg-gray-900/50 uppercase">{label}</span>
 }
 
 export default Landing;

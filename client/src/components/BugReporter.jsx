@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api'; // Use centralized API
 import { FaBug, FaExclamationTriangle } from 'react-icons/fa';
 
 function BugReporter({ repoId, commitHash }) {
@@ -10,7 +10,7 @@ function BugReporter({ repoId, commitHash }) {
   const report = async () => {
     try {
       setStatus('TRANSMITTING...');
-      await axios.post('http://gitvox.onrender.com/api/bugs', { repoId, commitHash, description: desc, severity });
+      await api.post('/api/bugs', { repoId, commitHash, description: desc, severity });
       setStatus('SUCCESS: TICKET_LOGGED');
       setDesc('');
       setTimeout(() => setStatus(''), 3000);

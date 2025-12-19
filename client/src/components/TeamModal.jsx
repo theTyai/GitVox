@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api'; // Use centralized API
 import { FaUsers, FaPlus, FaCircle, FaClock, FaTimes, FaTrash } from 'react-icons/fa';
 
 function TeamModal({ repo, onClose, onUpdate, isOwner, currentUser }) {
@@ -7,7 +7,7 @@ function TeamModal({ repo, onClose, onUpdate, isOwner, currentUser }) {
   
   const handleAdd = async () => {
     try {
-        await axios.post(`http://gitvox.onrender.com/api/repo/${repo._id}/collaborator`, { username: newCollab });
+        await api.post(`/api/repo/${repo._id}/collaborator`, { username: newCollab });
         onUpdate();
         setNewCollab('');
     } catch (err) { alert(err.response?.data?.error); }
@@ -15,7 +15,7 @@ function TeamModal({ repo, onClose, onUpdate, isOwner, currentUser }) {
 
   const handleRemove = async (username) => {
       if(!window.confirm("Revoke access?")) return;
-      await axios.delete(`http://gitvox.onrender.com/api/repo/${repo._id}/collaborator`, { data: { username } });
+      await api.delete(`/api/repo/${repo._id}/collaborator`, { data: { username } });
       onUpdate();
   };
 
@@ -23,7 +23,6 @@ function TeamModal({ repo, onClose, onUpdate, isOwner, currentUser }) {
     <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-[150] font-mono">
       <div className="bg-[#0a0a0a] border border-gray-800 w-full max-w-lg shadow-2xl flex flex-col max-h-[80vh]">
         
-        {/* Header */}
         <div className="bg-gray-900/50 p-4 border-b border-gray-800 flex justify-between items-center">
              <div className="flex items-center gap-2 text-white font-bold uppercase tracking-widest">
                  <FaUsers className="text-gray-500"/> Team Roster
@@ -31,7 +30,6 @@ function TeamModal({ repo, onClose, onUpdate, isOwner, currentUser }) {
              <button onClick={onClose} className="text-gray-500 hover:text-white"><FaTimes/></button>
         </div>
 
-        {/* Add User */}
         {isOwner && (
             <div className="p-4 border-b border-gray-800 bg-black flex gap-2">
                 <input 
@@ -46,10 +44,7 @@ function TeamModal({ repo, onClose, onUpdate, isOwner, currentUser }) {
             </div>
         )}
 
-        {/* List */}
         <div className="flex-1 overflow-y-auto p-2 bg-[#050505] space-y-1">
-            
-            {/* Active Users */}
             <div className="px-2 py-1 text-[10px] text-gray-600 uppercase font-bold mt-2">Active Personnel</div>
             {repo.allowedUsers.map(u => (
                 <div key={u} className="flex justify-between items-center p-3 bg-[#111] border border-transparent hover:border-gray-700">
@@ -70,7 +65,6 @@ function TeamModal({ repo, onClose, onUpdate, isOwner, currentUser }) {
                 </div>
             ))}
 
-            {/* Pending Users */}
             {repo.pendingUsers?.length > 0 && (
                 <>
                 <div className="px-2 py-1 text-[10px] text-gray-600 uppercase font-bold mt-4">Pending Authorization</div>

@@ -7,7 +7,7 @@ function TeamModal({ repo, onClose, onUpdate, isOwner, currentUser }) {
   
   const handleAdd = async () => {
     try {
-        await axios.post(`http://localhost:5000/api/repo/${repo._id}/collaborator`, { username: newCollab });
+        await axios.post(`http://gitvox.onrender.com/api/repo/${repo._id}/collaborator`, { username: newCollab });
         onUpdate();
         setNewCollab('');
     } catch (err) { alert(err.response?.data?.error); }
@@ -15,7 +15,7 @@ function TeamModal({ repo, onClose, onUpdate, isOwner, currentUser }) {
 
   const handleRemove = async (username) => {
       if(!window.confirm("Revoke access?")) return;
-      await axios.delete(`http://localhost:5000/api/repo/${repo._id}/collaborator`, { data: { username } });
+      await axios.delete(`http://gitvox.onrender.com/api/repo/${repo._id}/collaborator`, { data: { username } });
       onUpdate();
   };
 

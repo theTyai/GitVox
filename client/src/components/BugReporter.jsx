@@ -10,7 +10,7 @@ function BugReporter({ repoId, commitHash }) {
   const report = async () => {
     try {
       setStatus('TRANSMITTING...');
-      await axios.post('http://localhost:5000/api/bugs', { repoId, commitHash, description: desc, severity });
+      await axios.post('http://gitvox.onrender.com/api/bugs', { repoId, commitHash, description: desc, severity });
       setStatus('SUCCESS: TICKET_LOGGED');
       setDesc('');
       setTimeout(() => setStatus(''), 3000);

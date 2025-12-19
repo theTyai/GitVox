@@ -9,7 +9,7 @@ function ActivityFeed() {
   useEffect(() => {
     const fetchActivity = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/activity/feed');
+        const res = await axios.get('http://gitvox.onrender.com/api/activity/feed');
         setActivities(res.data);
       } catch (e) {}
     };
